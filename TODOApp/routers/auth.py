@@ -31,6 +31,7 @@ class CreateUserRequest(BaseModel):
     last_name: str
     password: str
     role: str
+    phone_number: str
 
 
 class Token(BaseModel):
@@ -54,10 +55,13 @@ def hash_password(password: str):
 
 
 def authenticate_user(username: str, password: str, db: db_dependency):
-    user = db.query(Users).filter(Users.username == username).first()
-    if user is None:
-        return False
-    return user if bcrypt_context.verify(password, user.hashed_password) else False
+    try:
+        user = db.query(Users).filter(Users.username == username).first()
+        if user is None:
+            return False
+        return user if bcrypt_context.verify(password, user.hashed_password) else False
+    except Exception as ex:
+        raise ex
 
 
 def create_access_token(username: str, user_id: int, role: str, expire_delta: timedelta):
@@ -90,7 +94,8 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         last_name=create_user_request.last_name,
         role=create_user_request.role,
         hashed_password=hash_password(create_user_request.password),
-        is_active=True
+        is_active=True,
+        phone_number=create_user_request.phone_number
     )
 
     db.add(create_user_model)

@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import Annotated
-from database import SessionLocal
-from models import Users
+from ..database import SessionLocal
+from ..models import Users
 from passlib.context import CryptContext
 from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
@@ -31,7 +31,7 @@ class CreateUserRequest(BaseModel):
     last_name: str
     password: str
     role: str
-    phone_number: str
+    #phone_number: str
 
 
 class Token(BaseModel):
@@ -94,8 +94,8 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         last_name=create_user_request.last_name,
         role=create_user_request.role,
         hashed_password=hash_password(create_user_request.password),
-        is_active=True,
-        phone_number=create_user_request.phone_number
+        is_active=True
+        #phone_number=create_user_request.phone_number
     )
 
     db.add(create_user_model)

@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, APIRouter
-from models import Users
-from database import SessionLocal
+from ..models import Users
+from ..database import SessionLocal
 from typing import Annotated
 from sqlalchemy.orm import Session
 from starlette import status
@@ -53,12 +53,12 @@ async def change_password(user: user_dependency, db: db_dependency,user_verifica
 
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Old Password does not match")
 
-@router.put('phonenumber/{phone_number}', status_code=status.HTTP_204_NO_CONTENT)
-async def change_phone_number(user:user_dependency, db: db_dependency, phone_number: str):
-
-    if user is None:
-        raise HTTPException(status_code=401, detail="Authentication failed")
-
-    user_model = db.query(Users).filter(Users.Id == user.get("id")).first()
-    user_model.phone_number = phone_number
-    db.commit()
+# @router.put('phonenumber/{phone_number}', status_code=status.HTTP_204_NO_CONTENT)
+# async def change_phone_number(user:user_dependency, db: db_dependency, phone_number: str):
+#
+#     if user is None:
+#         raise HTTPException(status_code=401, detail="Authentication failed")
+#
+#     user_model = db.query(Users).filter(Users.id == user.get("id")).first()
+#     user_model.phone_number = phone_number
+#     db.commit()

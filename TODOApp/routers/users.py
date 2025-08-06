@@ -51,7 +51,7 @@ async def change_password(user: user_dependency, db: db_dependency,user_verifica
         db.commit()
         return
 
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Old Password does not match")
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password!")
 
 # @router.put('phonenumber/{phone_number}', status_code=status.HTTP_204_NO_CONTENT)
 # async def change_phone_number(user:user_dependency, db: db_dependency, phone_number: str):

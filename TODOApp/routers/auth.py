@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import Annotated
@@ -9,6 +9,7 @@ from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 from datetime import timedelta, datetime, timezone
+from fastapi.templating import Jinja2Templates
 
 router = APIRouter(
     prefix="/auth",
@@ -31,7 +32,7 @@ class CreateUserRequest(BaseModel):
     last_name: str
     password: str
     role: str
-    #phone_number: str
+    # phone_number: str
 
 
 class Token(BaseModel):
@@ -49,6 +50,22 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
+templates = Jinja2Templates(directory="TODOApp/templates")
+
+
+### Pages ###
+
+@router.get("/login-page")
+def render_login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
+@router.get("/register-page")
+def render_register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+
+### Endpoints ###
 
 def hash_password(password: str):
     return bcrypt_context.hash(password)
@@ -95,7 +112,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         role=create_user_request.role,
         hashed_password=hash_password(create_user_request.password),
         is_active=True
-        #phone_number=create_user_request.phone_number
+        # phone_number=create_user_request.phone_number
     )
 
     db.add(create_user_model)

@@ -1,14 +1,14 @@
+from datetime import timedelta, datetime, timezone
+from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from typing import Annotated
+from starlette import status
 from ..database import SessionLocal
 from ..models import Users
 from passlib.context import CryptContext
-from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
-from datetime import timedelta, datetime, timezone
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter(
@@ -22,7 +22,7 @@ SECRET_KEY = '05052b1a7af624fe4e57797fb9db60da84a3820e0e872c492326ce0aa1f409ea'
 ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='/auth/token')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
 
 
 class CreateUserRequest(BaseModel):
@@ -65,18 +65,19 @@ def render_register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
 
-### Endpoints ###
-
 def hash_password(password: str):
     return bcrypt_context.hash(password)
 
 
+### Endpoints ###
 def authenticate_user(username: str, password: str, db: db_dependency):
     try:
         user = db.query(Users).filter(Users.username == username).first()
         if user is None:
             return False
-        return user if bcrypt_context.verify(password, user.hashed_password) else False
+        if not bcrypt_context.verify(password, user.hashed_password):
+            return False
+        return user
     except Exception as ex:
         raise ex
 

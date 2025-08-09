@@ -16,7 +16,7 @@
             };
 
             try {
-                const response = await fetch('/todos/todo', {
+                const response = await fetch('/todos', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -189,7 +189,6 @@
                 phone_number: data.phone_number,
                 password: data.password
             };
-
             try {
                 const response = await fetch('/auth', {
                     method: 'POST',
@@ -198,7 +197,6 @@
                     },
                     body: JSON.stringify(payload)
                 });
-
                 if (response.ok) {
                     window.location.href = '/auth/login-page';
                 } else {
